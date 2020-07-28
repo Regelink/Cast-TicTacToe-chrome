@@ -136,6 +136,12 @@ function TicTacToeAppCtrl($scope) {
    * @private
    */
   this.playAction = false;
+  
+  /**
+   * @type {string}
+   * @private
+   */
+  this.joinSessionId = (new URLSearchParams(window.location.search)).get('sessionId');
 
   window['__onGCastApiAvailable'] = (function(loaded, errorInfo) {
     if (loaded) {
@@ -330,9 +336,14 @@ TicTacToeAppCtrl.prototype.safeApply_ = function() {
  * @private
  */
 TicTacToeAppCtrl.prototype.launch_ = function() {
-  this.appendMessage_('launching...');
-  chrome.cast.requestSession(this.sessionListener_.bind(this),
-    this.onError_.bind(this));
+  if (this.joinSessionId) {
+    this.appendMessage_('joining ' + this.joinSessionId + ' ...' );
+    chrome.cast.requestSessionById(this.joinSessionId);
+  } else {
+    this.appendMessage_('launching...');
+    chrome.cast.requestSession(this.sessionListener_.bind(this),
+      this.onError_.bind(this));
+  }
 };
 
 /**
